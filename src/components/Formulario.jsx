@@ -1,21 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const Formulario = () => {
   const [formData, setFormData] = useState({
-    day: '',
     date: '',
     kilometers: '',
     time: '',
     shoes: '',
   });
+  const [averagePace, setAveragePace] = useState('');
+  const [dayOfWeek, setDayOfWeek] = useState('');
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === 'time' || name === 'kilometers') {
+      calculateAveragePace({ ...formData, [name]: value });
+    }
+
+    if (name === 'date') {
+      const date = new Date(value);
+      const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+      setDayOfWeek(days[date.getDay()]);
+    }
+  };
+
+  const calculateAveragePace = ({ time, kilometers }) => {
+    if (time && kilometers) {
+      const [minutes, seconds] = time.split(':').map(Number);
+      const totalSeconds = minutes * 60 + seconds;
+      const paceSeconds = totalSeconds / parseFloat(kilometers);
+      const paceMinutes = Math.floor(paceSeconds / 60);
+      const paceRemainderSeconds = Math.round(paceSeconds % 60);
+      setAveragePace(`${paceMinutes}:${paceRemainderSeconds.toString().padStart(2, '0')} min/km`);
+    } else {
+      setAveragePace('');
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes manejar el envío de los datos
     console.log(formData);
   };
 
@@ -23,25 +47,6 @@ const Formulario = () => {
     <div className="max-w-md mx-auto bg-white p-5 rounded-md shadow-md">
       <h2 className="text-2xl font-bold text-center mb-5">Ingresar Datos</h2>
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="day" className="block text-sm font-medium text-gray-700">Día de la semana</label>
-          <select
-            id="day"
-            name="day"
-            value={formData.day}
-            onChange={handleChange}
-            className="mt-1 p-3 w-full border border-gray-300 rounded-md"
-          >
-            <option value="">Selecciona un día</option>
-            <option value="Lunes">Lunes</option>
-            <option value="Martes">Martes</option>
-            <option value="Miércoles">Miércoles</option>
-            <option value="Jueves">Jueves</option>
-            <option value="Viernes">Viernes</option>
-            <option value="Sábado">Sábado</option>
-            <option value="Domingo">Domingo</option>
-          </select>
-        </div>
         <div className="mb-4">
           <label htmlFor="date" className="block text-sm font-medium text-gray-700">Fecha</label>
           <input
@@ -53,6 +58,12 @@ const Formulario = () => {
             className="mt-1 p-3 w-full border border-gray-300 rounded-md"
           />
         </div>
+        {dayOfWeek && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Día de la semana</label>
+            <p className="mt-1 p-3 w-full border border-gray-300 rounded-md bg-gray-100">{dayOfWeek}</p>
+          </div>
+        )}
         <div className="mb-4">
           <label htmlFor="kilometers" className="block text-sm font-medium text-gray-700">Kilómetros recorridos</label>
           <input
@@ -76,6 +87,12 @@ const Formulario = () => {
             placeholder="Ej. 50:03"
           />
         </div>
+        {averagePace && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">Ritmo promedio</label>
+            <p className="mt-1 p-3 w-full border border-gray-300 rounded-md bg-gray-100">{averagePace}</p>
+          </div>
+        )}
         <div className="mb-4">
           <label htmlFor="shoes" className="block text-sm font-medium text-gray-700">Tenis usados</label>
           <input
