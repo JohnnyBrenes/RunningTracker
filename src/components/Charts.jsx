@@ -9,6 +9,7 @@ const Charts = () => {
   const [chartType, setChartType] = useState('kms'); // Controla el tipo de gráfica
   const [period, setPeriod] = useState('mes'); // Controla el periodo de comparación
 
+  // Datos de Ejemplo
   const dataKms = {
     labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo'],
     datasets: [
